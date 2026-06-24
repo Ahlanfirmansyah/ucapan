@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🕹️ SUPER RETRO LULUS MACHINE v2.0 🕹️</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Press+Start+2P&display=swap" rel="stylesheet" />
+    <style>
+        /* ─── GABUNGAN STYLE DARI KEDUA KODE ─── */
+
+        /* RESET & DASAR */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Fredoka', sans-serif;
+            min-height: 100vh;
+            background: #0f0a1c;
+            background-image:
+                linear-gradient(rgba(236, 72, 153, 0.08) 2px, transparent 2px),
+                linear-gradient(90deg, rgba(236, 72, 153, 0.08) 2px, transparent 2px);
+            background-size: 30px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        /* ─── LAYAR LOADING (INTRO) ─── */
+        #game-boot-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #05020c;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            transition: all 0.6s cubic-bezier(0.74, 0.03, 0.27, 1);
+        }
+
+        #game-boot-container.fade-away {
+            opacity: 0;
+            transform: scale(1.15);
+            pointer-events: none;
+        }
+
+        .pixel-logo {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 16px;
+            color: #22d3ee;
+            text-shadow: 3px 3px 0 #ff3e6c;
+            text-align: center;
+            line-height: 1.8;
+            letter-spacing: 1px;
+        }
+
+        .loading-status-box {
+            width: 240px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .status-text {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 8px;
+            color: #a78bfa;
+            letter-spacing: 1px;
+        }
+
+        .progress-bar-border {
+            width: 100%;
+            height: 14px;
+            border: 2px solid #fff;
+            background: #000;
+            padding: 2px;
+            border-radius: 4px;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #ff3e6c, #22d3ee);
+            transition: width 0.08s linear;
+        }
+
+        .start-btn {
+            display: none;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 12px;
+            color: #fede6d;
+            background: none;
+            border: none;
+            cursor: pointer;
+            animation: textBlink 0.8s infinite;
+            margin-top: 10px;
+        }
+
+        @keyframes textBlink {
+            0%,
+            100% {
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* ─── AMBIENT GLOW ─── */
+        .cyber-glow {
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.2) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+            animation: floatingGlow 6s infinite alternate ease-in-out;
+        }
+        @keyframes floatingGlow {
+            0% {
+                transform: translate(-50px, -50px) scale(0.9);
+            }
+            100% {
+                transform: translate(50px, 50px) scale(1.1);
+            }
+        }
+
+        /* ─── ARCADE CABINET ─── */
+        .arcade-cabinet {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 460px;
+            background: #2e1d4a;
+            border: 6px solid #ff3e6c;
+            border-radius: 36px;
+            box-shadow:
+                0 15px 0 #b8143d,
+                0 30px 60px rgba(0, 0, 0, 0.6),
+                inset 0 0 20px rgba(255, 255, 255, 0.1);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            transition: transform 0.1s ease;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s ease 0.4s;
+        }
+
+        body.game-ready .arcade-cabinet {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Screen Wrapper */
+        .screen-container {
+            width: 100%;
+            background: #140d24;
+            border: 4px solid #1c1233;
+            border-radius: 20px;
+            padding: 20px;
+            min-height: 340px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.8);
+        }
+
+        .screen-container.hyper-mode {
+            animation: hyperNeon 0.5s infinite linear;
+        }
+        @keyframes hyperNeon {
+            0% {
+                border-color: #ff3e6c;
+                box-shadow: inset 0 0 30px rgba(255, 62, 108, 0.5);
+            }
+            33% {
+                border-color: #fede6d;
+                box-shadow: inset 0 0 30px rgba(254, 222, 109, 0.5);
+            }
+            66% {
+                border-color: #22d3ee;
+                box-shadow: inset 0 0 30px rgba(34, 211, 238, 0.5);
+            }
+            100% {
+                border-color: #ff3e6c;
+                box-shadow: inset 0 0 30px rgba(255, 62, 108, 0.5);
+            }
+        }
+
+        .screen-container::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%);
+            background-size: 100% 4px;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        /* ─── SCENE ─── */
+        .scene {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            width: 100%;
+            margin: auto 0;
+        }
+        .scene.active {
+            display: flex;
+            animation: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes bounceIn {
+            0% {
+                transform: translateY(40px) scale(0.7);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .avatar-box {
+            font-size: 70px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            filter: drop-shadow(0 6px 0 rgba(0, 0, 0, 0.4));
+            display: inline-block;
+            animation: floatMove 1.5s infinite alternate ease-in-out;
+        }
+        @keyframes floatMove {
+            0% {
+                transform: translateY(0) rotate(-5deg);
+            }
+            100% {
+                transform: translateY(-10px) rotate(5deg);
+            }
+        }
+
+        /* Khusus Efek Menang */
+        .winner-title {
+            animation: rainbowText 1.5s infinite linear;
+        }
+        @keyframes rainbowText {
+            0%,
+            100% {
+                color: #ff3e6c;
+                text-shadow: 2px 2px 0 #22d3ee;
+            }
+            33% {
+                color: #22d3ee;
+                text-shadow: 2px 2px 0 #fede6d;
+            }
+            66% {
+                color: #fede6d;
+                text-shadow: 2px 2px 0 #ff3e6c;
+            }
+        }
+
+        /* ─── TEXT FORMATTING ─── */
+        .pixel-header {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 13px;
+            color: #ff3e6c;
+            text-shadow: 2px 2px 0 #000;
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+        }
+        .main-speech {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.5;
+        }
+        .sub-speech {
+            font-size: 0.9rem;
+            color: #d8b4fe;
+            margin-top: 8px;
+            opacity: 0.9;
+        }
+
+        /* ─── HUD PANEL ─── */
+        .hud-panel {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 9px;
+            color: #fede6d;
+            text-shadow: 1px 1px 0 #000;
+            z-index: 6;
+        }
+        .bar-container {
+            width: 60%;
+            height: 12px;
+            border: 2px solid #fff;
+            background: #000;
+            border-radius: 6px;
+            padding: 1px;
+            overflow: hidden;
+        }
+        .bar-fill {
+            height: 100%;
+            width: 25%;
+            background: #ff3e6c;
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        /* ─── RATING BINTANG ─── */
+        .rating-hub {
+            background: #1c1233;
+            border: 3px solid #ff3e6c;
+            border-radius: 20px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+        .rating-hub span {
+            font-size: 0.8rem;
+            color: #fff;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .stars-row {
+            display: flex;
+            gap: 6px;
+        }
+        .star {
+            font-size: 28px;
+            color: #4a3473;
+            cursor: pointer;
+            transition: transform 0.1s ease, color 0.1s ease;
+        }
+        .star:hover {
+            transform: scale(1.2);
+        }
+        .star.active {
+            color: #fede6d;
+            filter: drop-shadow(0 0 6px #fede6d);
+        }
+        .status-toast {
+            font-size: 0.8rem;
+            color: #ff85a7;
+            font-weight: 600;
+            min-height: 16px;
+        }
+
+        /* ─── CONTROLLER PAD ─── */
+        .hardware-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 8px;
+        }
+
+        .joystick-base {
+            width: 65px;
+            height: 65px;
+            background: #140d24;
+            border-radius: 50%;
+            position: relative;
+            border: 4px solid #1c1233;
+            cursor: pointer;
+        }
+        .joystick-knob {
+            width: 36px;
+            height: 36px;
+            background: #ff3e6c;
+            border-radius: 50%;
+            position: absolute;
+            top: 11px;
+            left: 11px;
+            box-shadow: inset -4px -4px 0 rgba(0, 0, 0, 0.3), 0 4px 8px rgba(0, 0, 0, 0.4);
+            transition: transform 0.1s ease;
+        }
+        .joystick-base:active .joystick-knob {
+            transform: translate(6px, 6px);
+        }
+
+        .btn-action {
+            background: #22d3ee;
+            border: 4px solid #140d24;
+            padding: 12px 28px;
+            border-radius: 18px;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #140d24;
+            cursor: pointer;
+            box-shadow: 0 5px 0 #140d24;
+            transition: all 0.05s ease;
+        }
+        .btn-action:active {
+            transform: translateY(5px);
+            box-shadow: 0 0 0 #140d24;
+        }
+
+        /* ─── CANVAS CONFETTI ─── */
+        #star-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* ─── MP3 PLAYER (POJOK KANAN) ─── */
+        .mp3-corner {
+            position: fixed;
+            right: 30px;
+            top: 30px;
+            z-index: 9998;
+            background: rgba(20, 13, 36, 0.85);
+            backdrop-filter: blur(8px);
+            border: 2px solid #22d3ee;
+            border-radius: 16px;
+            padding: 10px 12px 12px 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+            transition: border-color 0.3s ease, transform 0.2s ease;
+            max-width: 260px;
+            width: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .mp3-corner:hover {
+            border-color: #fede6d;
+            transform: scale(1.02);
+        }
+        .mp3-corner .mp3-label {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 7px;
+            color: #22d3ee;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            text-align: center;
+            opacity: 0.9;
+        }
+        .mp3-corner .mp3-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+        }
+        .mp3-corner .mp3-controls button {
+            background: #22d3ee;
+            border: none;
+            border-radius: 10px;
+            padding: 6px 12px;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #140d24;
+            cursor: pointer;
+            transition: 0.1s ease;
+            box-shadow: 0 3px 0 #0c7a8a;
+            flex: 1;
+        }
+        .mp3-corner .mp3-controls button:active {
+            transform: translateY(3px);
+            box-shadow: 0 0px 0 #0c7a8a;
+        }
+        .mp3-corner .mp3-controls input[type="file"] {
+            display: none;
+        }
+        .mp3-corner .mp3-file-label {
+            background: #ff3e6c;
+            border: none;
+            border-radius: 10px;
+            padding: 6px 12px;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: #fff;
+            cursor: pointer;
+            transition: 0.1s ease;
+            box-shadow: 0 3px 0 #a8244a;
+            text-align: center;
+            flex: 1.2;
+        }
+        .mp3-corner .mp3-file-label:active {
+            transform: translateY(3px);
+            box-shadow: 0 0px 0 #a8244a;
+        }
+        .mp3-corner .mp3-status {
+            font-size: 0.65rem;
+            color: #d8b4fe;
+            text-align: center;
+            font-weight: 400;
+            min-height: 16px;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ─── RESPONSIVE ─── */
+        @media (max-width: 768px) {
+            .mp3-corner {
+                right: 16px;
+                top: 16px;
+                max-width: 200px;
+                padding: 8px 10px;
+            }
+            .mp3-corner .mp3-controls button,
+            .mp3-corner .mp3-file-label {
+                font-size: 0.7rem;
+                padding: 4px 8px;
+            }
+            .mp3-corner .mp3-status {
+                font-size: 0.55rem;
+            }
+        }
+        @media (max-width: 480px) {
+            .arcade-cabinet {
+                padding: 16px;
+            }
+            .screen-container {
+                padding: 14px;
+                min-height: 280px;
+            }
+            .avatar-box {
+                font-size: 50px;
+            }
+            .main-speech {
+                font-size: 1rem;
+            }
+            .pixel-header {
+                font-size: 10px;
+            }
+            .star {
+                font-size: 22px;
+            }
+            .mp3-corner {
+                right: 10px;
+                top: 10px;
+                max-width: 160px;
+                padding: 6px 8px;
+                border-width: 1px;
+            }
+            .mp3-corner .mp3-controls button,
+            .mp3-corner .mp3-file-label {
+                font-size: 0.6rem;
+                padding: 3px 6px;
+            }
+            .mp3-corner .mp3-status {
+                font-size: 0.5rem;
+                min-height: 12px;
+            }
+            .mp3-corner .mp3-label {
+                font-size: 6px;
+            }
+        }
+        @media (max-width: 380px) {
+            .mp3-corner {
+                max-width: 140px;
+                right: 6px;
+                top: 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ─── 1. LAYAR LOADING (INTRO) ─── -->
+    <div id="game-boot-container">
+        <div class="pixel-logo">INITIALIZING<br>SYSTEM...</div>
+
+        <div class="loading-status-box" id="loaderBox">
+            <span class="status-text" id="statusMessage">LOADING MEMORY...</span>
+            <div class="progress-bar-border">
+                <div class="progress-bar-fill" id="progressBar"></div>
+            </div>
+        </div>
+
+        <button class="start-btn" id="startActionBtn">👉 PRESS START 👈</button>
+    </div>
+
+    <!-- ─── 2. ARCADE CABINET UTAMA ─── -->
+    <div class="cyber-glow"></div>
+    <canvas id="star-canvas"></canvas>
+
+    <!-- ─── MP3 PLAYER DI POJOK KANAN ─── -->
+    <div class="mp3-corner" id="mp3Corner">
+        <div class="mp3-label">🎵 I Knew It,I Knew You</div>
+        <div class="mp3-controls">
+            <button id="playPauseBtn">▶</button>
+            <input type="file" id="mp3FileInput" accept=".mp3,.m4a,.aac,.wav,.ogg" />
+        </div>
+        <div class="mp3-status" id="mp3Status">🔍 Cek file MP3...</div>
+    </div>
+
+    <div class="arcade-cabinet" id="arcadeBox">
+
+        <!-- SCREEN -->
+        <div class="screen-container" id="gameScreen">
+
+            <!-- HUD TOP BAR -->
+            <div class="hud-panel">
+                <span>LVL 09</span>
+                <div class="bar-container">
+                    <div class="bar-fill" id="xpFill"></div>
+                </div>
+                <span>STAGE <span id="stageNum">1</span></span>
+            </div>
+
+            <!-- SCENE 0: INTRO -->
+            <div class="scene active" data-step="0">
+                <div class="avatar-box" id="heroAvatar">👾</div>
+                <div class="pixel-header">PRESS START ANYWAY</div>
+                <p class="main-speech">Kiw kiw kiw ada yang  <span style="color: #fede6d;">udah lulus</span> nihhh✨</p>
+                <p class="sub-speech">Pencet tombol biru di bawah buat lanjut!</p>
+            </div>
+
+            <!-- SCENE 1: MAWAR -->
+            <div class="scene" data-step="1">
+                <div class="avatar-box">🌹</div>
+                <div class="pixel-header">ITEM UNLOCKED!</div>
+                <p class="main-speech">Makasih banyak yaaa, <span style="color: #22d3ee;">Bunga Mawarnya</span> cakep banget!</p>
+                <p class="sub-speech">Padahal kan cuma bercanda ya, eh dikasi beneran donggg wkwkwkkwkw</p>
+            </div>
+
+            <!-- SCENE 2: MILO -->
+            <div class="scene" data-step="2">
+                <div style="font-size:70px; margin-bottom:12px;">🥤</div>
+                <div class="pixel-header">MANA REFILL +100</div>
+                <p class="main-speech">Milonya langsung aku minum seger pol,</p>
+                <p class="sub-speech">Pas bgt buat nemenin begadang sambil fokus nge-gambar wkwkw</p>
+            </div>
+
+            <!-- SCENE 3: PENUTUP -->
+            <div class="scene" data-step="3">
+                <div class="avatar-box" style="animation: bounceIn 0.8s infinite alternate ease-in-out;">👑</div>
+                <div class="pixel-header winner-title">GAME CLEAR! 🏆</div>
+                <p class="main-speech"><span style="color: #ff3e6c;">Maaf banget yaa</span> belum bisa datang langsung..</p>
+                <p class="sub-speech" style="font-size: 0.85rem; color: #fff; margin-top: 6px;">
+                    Terimakasi suda menjadi orang baekkkk Moga kakak sukses terus, dikelilingi orang baik, dan semua doa-doanya terkabul! ⚡
+                </p>
+                <p style="margin-top: 10px; font-size: 0.75rem; color: #a5f3fc; font-weight: 600; font-style: italic;">
+                    Ciyee yang dulu kepengen skulll di SMK 3 Bogor, ujung-ujungnya malah masuk ke Wk eh tiba-tiba lulus wkwkwkwkk! 🚀
+                </p>
+            </div>
+
+            <div class="status-toast" id="toastMsg">Goyang joystick kiri untuk ubah karakter!</div>
+        </div>
+
+        <!-- RATING BINTANG -->
+        <div class="rating-hub">
+            <span>BERI RATING STAGE 🌟</span>
+            <div class="stars-row" id="starsWrapper">
+                <div class="star" data-idx="1">★</div>
+                <div class="star" data-idx="2">★</div>
+                <div class="star" data-idx="3">★</div>
+                <div class="star" data-idx="4">★</div>
+                <div class="star" data-idx="5">★</div>
+            </div>
+        </div>
+
+        <!-- CONTROLLER -->
+        <div class="hardware-controls">
+            <div class="joystick-base" id="joyStickBtn" title="Klik aku!">
+                <div class="joystick-knob"></div>
+            </div>
+            <button class="btn-action" id="actionBtn">ACTION 🕹️</button>
+        </div>
+
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // ─── 1. SISTEM LOADING (INTRO) ───
+            const bootContainer = document.getElementById('game-boot-container');
+            const progressBar = document.getElementById('progressBar');
+            const statusMessage = document.getElementById('statusMessage');
+            const loaderBox = document.getElementById('loaderBox');
+            const startActionBtn = document.getElementById('startActionBtn');
+
+            let progressValue = 0;
+            const messages = ["CONNECTING...", "LOADING ASSETS...", "RENDERING MAP...", "SUCCESS!"];
+
+            // ─── EFEK SUARA (tanpa musik latar) ───
+            const audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+
+            function playBeep(freq, duration, type = 'square', vol = 0.05) {
+                try {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + duration);
+                } catch (e) {}
+            }
+
+            function playVictoryMelody() {
+                const notes = [
+                    { f: 523.25, d: 0.1 },
+                    { f: 659.25, d: 0.1 },
+                    { f: 783.99, d: 0.1 },
+                    { f: 1046.50, d: 0.15 },
+                    { f: 783.99, d: 0.1 },
+                    { f: 1046.50, d: 0.4 }
+                ];
+                notes.forEach((note, index) => {
+                    setTimeout(() => {
+                        playBeep(note.f, note.d, 'square', 0.04);
+                    }, index * 130);
+                });
+            }
+
+            let loadingInterval = setInterval(() => {
+                if (progressValue >= 100) {
+                    clearInterval(loadingInterval);
+                    statusMessage.innerText = messages[3];
+                    playBeep(587.33, 0.1);
+                    setTimeout(() => playBeep(880, 0.15), 100);
+
+                    setTimeout(() => {
+                        loaderBox.style.display = 'none';
+                        startActionBtn.style.display = 'block';
+                    }, 400);
+                } else {
+                    progressValue += Math.floor(Math.random() * 12) + 2;
+                    if (progressValue > 100) progressValue = 100;
+                    progressBar.style.width = progressValue + '%';
+                    if (progressValue > 30 && progressValue < 65) statusMessage.innerText = messages[1];
+                    if (progressValue >= 65 && progressValue < 95) statusMessage.innerText = messages[2];
+                }
+            }, 90);
+
+            // ─── 2. MP3 PLAYER (otomatis muat file dari folder yang sama) ───
+            const audioPlayer = new Audio();
+            const playPauseBtn = document.getElementById('playPauseBtn');
+            const mp3FileInput = document.getElementById('mp3FileInput');
+            const mp3Status = document.getElementById('mp3Status');
+
+            // Nama file MP3 yang diharapkan berada di folder yang sama
+            const EMBEDDED_FILE = "EMBEDDED_MP3_DATA.mp3";
+
+            // Coba muat file tersebut
+            audioPlayer.src = EMBEDDED_FILE;
+            audioPlayer.load();
+
+            audioPlayer.onloadeddata = function() {
+                mp3Status.textContent = `🎵 ${EMBEDDED_FILE} siap`;
+                // Setelah dimuat, kita tidak auto-play dulu, nanti di-start
+            };
+
+            audioPlayer.onerror = function() {
+                // Jika file tidak ditemukan, reset dan beri tahu user
+                audioPlayer.src = '';
+                mp3Status.textContent = '⚠️ File MP3 tidak ditemukan, upload sendiri';
+            };
+
+            // Fungsi untuk memuat file dari input
+            function loadMP3(file) {
+                const url = URL.createObjectURL(file);
+                audioPlayer.src = url;
+                audioPlayer.load();
+                mp3Status.textContent = `🎵 ${file.name}`;
+                audioPlayer.onloadeddata = () => {
+                    URL.revokeObjectURL(url);
+                };
+                // reset status tombol
+                playPauseBtn.textContent = '▶';
+            }
+
+            mp3FileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    loadMP3(file);
+                }
+            });
+
+            // Tombol play/pause
+            playPauseBtn.addEventListener('click', () => {
+                if (!audioPlayer.src) {
+                    mp3Status.textContent = '⚠️ Pilih file MP3 dulu!';
+                    return;
+                }
+                if (audioPlayer.paused) {
+                    audioPlayer.play().catch(err => {
+                        mp3Status.textContent = '❌ Gagal memutar, coba klik ulang';
+                        console.warn(err);
+                    });
+                    playPauseBtn.textContent = '⏸';
+                } else {
+                    audioPlayer.pause();
+                    playPauseBtn.textContent = '▶';
+                }
+            });
+
+            audioPlayer.addEventListener('ended', () => {
+                playPauseBtn.textContent = '▶';
+                mp3Status.textContent = '⏹ Selesai';
+            });
+
+            // ─── 3. EVENT START GAME ───
+            startActionBtn.addEventListener('click', () => {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+
+                playBeep(987.77, 0.08);
+                setTimeout(() => playBeep(1318.51, 0.2), 80);
+                bootContainer.classList.add('fade-away');
+                document.body.classList.add('game-ready');
+
+                // Coba putar musik otomatis jika ada sumber audio
+                if (audioPlayer.src) {
+                    audioPlayer.play().catch(err => {
+                        // Autoplay mungkin diblokir, biarkan user klik play manual
+                        console.warn('Autoplay ditolak, silakan klik tombol play');
+                        mp3Status.textContent = '🎵 Klik play untuk memutar';
+                    });
+                }
+            });
+
+            // ─── 4. SISTEM ARCADE ───
+            const arcadeBox = document.getElementById('arcadeBox');
+            const gameScreen = document.getElementById('gameScreen');
+            const scenes = document.querySelectorAll('.scene');
+            const xpFill = document.getElementById('xpFill');
+            const stageNum = document.getElementById('stageNum');
+            const actionBtn = document.getElementById('actionBtn');
+            const joyStick = document.getElementById('joyStickBtn');
+            const heroAvatar = document.getElementById('heroAvatar');
+            const stars = document.querySelectorAll('.star');
+            const toastMsg = document.getElementById('toastMsg');
+
+            let currentStep = 0;
+            const totalSteps = scenes.length;
+            let confettiInterval = null;
+
+            const avatars = ['👾', '🐱', '🦊', '🦄', '🐰', '🐯'];
+            const rateReplies = {
+                1: "Yahh pelit bgt, naikin dong kakk 🥺",
+                2: "Wkwkwk okelahh makasih yaa! 😉",
+                3: "Mantap! 3 bintang mendarat aman! 🚀",
+                4: "Wihh keren, makasih ratingnya! ✨",
+                5: "HYPER COMBO! Kakak emang ter-the best! 🏆"
+            };
+
+            function hapticFeedback() {
+                arcadeBox.style.transform = "scale(0.97) translateY(5px)";
+                setTimeout(() => arcadeBox.style.transform = "none", 80);
+            }
+
+            // Joystick ganti avatar
+            joyStick.addEventListener('click', () => {
+                playBeep(587.33, 0.15, 'triangle');
+                hapticFeedback();
+                const randAvatar = avatars[Math.floor(Math.random() * avatars.length)];
+                if (heroAvatar) heroAvatar.innerText = randAvatar;
+                toastMsg.innerText = `Avatar berubah jadi ${randAvatar}! 🔄`;
+            });
+
+            // Rating bintang
+            stars.forEach(star => {
+                star.addEventListener('click', (e) => {
+                    const idx = parseInt(e.target.getAttribute('data-idx'));
+
+                    stars.forEach(s => {
+                        if (parseInt(s.getAttribute('data-idx')) <= idx) {
+                            s.classList.add('active');
+                        } else {
+                            s.classList.remove('active');
+                        }
+                    });
+
+                    toastMsg.innerText = rateReplies[idx];
+                    hapticFeedback();
+
+                    if (idx === 5) {
+                        playBeep(880, 0.1, 'square');
+                        setTimeout(() => playBeep(1318.51, 0.2, 'square'), 100);
+                        gameScreen.classList.add('hyper-mode');
+                        burstStars(35);
+                    } else if (currentStep !== totalSteps - 1) {
+                        playBeep(440, 0.1, 'sine');
+                        gameScreen.classList.remove('hyper-mode');
+                    }
+                });
+            });
+
+            // Navigasi scene
+            function runStage(step) {
+                scenes.forEach(s => s.classList.remove('active'));
+                scenes[step].classList.add('active');
+
+                stageNum.innerText = step + 1;
+                xpFill.style.width = `${((step + 1) / totalSteps) * 100}%`;
+
+                stars.forEach(s => s.classList.remove('active'));
+                toastMsg.innerText = "Beri rating keseruan halaman ini! ⭐";
+
+                if (confettiInterval) {
+                    clearInterval(confettiInterval);
+                    confettiInterval = null;
+                }
+
+                if (step === totalSteps - 1) {
+                    actionBtn.innerHTML = "RESET";
+                    gameScreen.classList.add('hyper-mode');
+                    playVictoryMelody();
+                    burstStars(50);
+                    confettiInterval = setInterval(() => {
+                        burstStars(25);
+                    }, 600);
+                } else {
+                    actionBtn.innerHTML = "ACTION 🕹️";
+                    gameScreen.classList.remove('hyper-mode');
+                }
+            }
+
+            actionBtn.addEventListener('click', () => {
+                hapticFeedback();
+                if (currentStep === totalSteps - 1) {
+                    playBeep(330, 0.15, 'sine');
+                    currentStep = 0;
+                } else {
+                    playBeep(523.25, 0.08, 'sine');
+                    currentStep++;
+                }
+                runStage(currentStep);
+            });
+
+            // ─── CONFETTI CANVAS ───
+            const canvas = document.getElementById('star-canvas');
+            const ctx = canvas.getContext('2d');
+            let w, h, particles = [],
+                animId = null;
+
+            function resize() {
+                w = canvas.width = window.innerWidth;
+                h = canvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resize);
+            resize();
+
+            class OrbitStar {
+                constructor() {
+                    this.x = w / 2 + (Math.random() * 100 - 50);
+                    this.y = h / 2 - 40;
+                    this.radius = Math.random() * 8 + 4;
+                    this.angle = Math.random() * Math.PI * 2;
+                    this.speed = Math.random() * 7 + 4;
+                    this.distance = Math.random() * 15;
+                    this.color = `hsl(${Math.random() * 360}, 100%, 70%)`;
+                    this.opacity = 1;
+                    this.decay = Math.random() * 0.012 + 0.008;
+                }
+                update() {
+                    this.distance += this.speed;
+                    this.angle += 0.03;
+                    this.x += Math.cos(this.angle) * 1.5;
+                    this.y = (h / 2 - 40) + Math.sin(this.angle) * this.distance * 0.8 + (1 - this.opacity) * 80;
+                    this.opacity -= this.decay;
+                }
+                draw() {
+                    ctx.save();
+                    ctx.globalAlpha = Math.max(0, this.opacity);
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    ctx.moveTo(this.x, this.y - this.radius);
+                    ctx.lineTo(this.x + this.radius * 0.4, this.y - this.radius * 0.4);
+                    ctx.lineTo(this.x + this.radius, this.y);
+                    ctx.lineTo(this.x + this.radius * 0.4, this.y + this.radius * 0.4);
+                    ctx.moveTo(this.x, this.y + this.radius);
+                    ctx.lineTo(this.x - this.radius * 0.4, this.y + this.radius * 0.4);
+                    ctx.lineTo(this.x - this.radius, this.y);
+                    ctx.lineTo(this.x - this.radius * 0.4, this.y - this.radius * 0.4);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.restore();
+                }
+            }
+
+            function burstStars(amt) {
+                for (let i = 0; i < amt; i++) { particles.push(new OrbitStar()); }
+                if (!animId) {
+                    function loop() {
+                        ctx.clearRect(0, 0, w, h);
+                        particles.forEach((p, i) => {
+                            if (p.opacity > 0) {
+                                p.update();
+                                p.draw();
+                            } else { particles.splice(i, 1); }
+                        });
+                        if (particles.length > 0) animId = requestAnimationFrame(loop);
+                        else animId = null;
+                    }
+                    loop();
+                }
+            }
+
+            // ─── INISIALISASI ───
+            runStage(0);
+
+        })();
+    </script>
+
+</body>
+</html>
